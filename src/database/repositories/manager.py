@@ -1,6 +1,9 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.database.repositories.abstract_manager import AbstractRepositoryManager
+from src.database.repositories.wallet_query_repository import (
+    WalletQueryRepository,
+)
 from src.db_manager import session_factory
 
 
@@ -17,6 +20,9 @@ class OrmRepositoryManager(AbstractRepositoryManager):
 
     async def close(self) -> None:
         await self._session.close()
+
+    def get_wallet_query_repository(self) -> WalletQueryRepository:
+        return WalletQueryRepository(session=self._session)
 
 
 def orm_repository_manager_factory() -> OrmRepositoryManager:

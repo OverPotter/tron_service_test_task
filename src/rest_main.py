@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 
-from src.api.endpoints import router
+from src.api.endpoints_v1 import router
 
 app = FastAPI(
     title="TronService",

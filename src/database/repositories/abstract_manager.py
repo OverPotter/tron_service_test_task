@@ -2,6 +2,10 @@ from abc import ABC, abstractmethod
 from inspect import Traceback
 from typing import Type
 
+from src.database.repositories.wallet_query_repository import (
+    WalletQueryRepository,
+)
+
 
 class AbstractRepositoryManager(ABC):
 
@@ -25,3 +29,6 @@ class AbstractRepositoryManager(ABC):
         else:
             await self.commit()
         await self.close()
+
+    @abstractmethod
+    def get_wallet_query_repository(self) -> WalletQueryRepository: ...

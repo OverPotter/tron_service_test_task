@@ -1,14 +1,14 @@
 from abc import ABC
-from typing import Generic, Sequence, Type, TypeVar
+from typing import Generic, Sequence, Tuple, Type, TypeVar
 
-from sqlalchemy import Executable, delete
+from sqlalchemy import delete, func
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
 from src.database.models.base import Base
 
 _MODEL_TYPE = TypeVar("_MODEL_TYPE", bound=Base)
-_QUERY = TypeVar("_QUERY", bound=Executable)
+_QUERY = TypeVar("_QUERY")
 
 
 class AbstractRepository(ABC, Generic[_MODEL_TYPE]):
@@ -38,3 +38,24 @@ class AbstractRepository(ABC, Generic[_MODEL_TYPE]):
     async def delete(self, **kwargs) -> None:
         query = delete(self._model).filter_by(**kwargs)
         await self._session.execute(query)
+
+    async def _paginate(
+        self,
+        query: _QUERY,
+        limit: int | None,
+        offset: int | None,
+        unique: bool = True,
+    ) -> Tuple[_QUERY, int]:
+        if unique:
+            count_query = select(func.count()).select_from(
+                query.distinct().subquery()
+            )
+        else:
+            count_query = select(func.count()).select_from(query.subquery())
+        if limit is not None:
+            query = query.limit(limit)
+        if offset is not None:
+            query = query.offset(offset)
+
+        count_result = await self._session.execute(count_query)
+        return query, count_result.scalar()

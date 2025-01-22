@@ -7,6 +7,8 @@ load_dotenv()
 
 
 class Settings(BaseSettings):
+    TRON_API_KEY: str
+
     PG_HOST: str
     PG_USER: str
     PG_PASS: str
