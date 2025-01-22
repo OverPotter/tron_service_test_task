@@ -4,7 +4,7 @@ from src.database.models._universal_type_annotations import created_at, intpk
 from src.database.models.base import Base
 
 
-class WalletQuery(Base):
+class WalletQueryModel(Base):
     __tablename__ = "wallet_queries"
 
     id: Mapped[intpk]

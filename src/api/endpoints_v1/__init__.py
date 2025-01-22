@@ -1,3 +1,7 @@
 from fastapi import APIRouter
 
-router = APIRouter(prefix="/api/v1/rating-service")
+from src.api.endpoints_v1.wallets import router as wallet_router
+
+router = APIRouter(prefix="/api/v1/tron-service")
+
+router.include_router(wallet_router, tags=["wallet"])

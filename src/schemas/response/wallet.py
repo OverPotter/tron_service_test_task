@@ -13,6 +13,6 @@ class WalletQueryResponse(BaseResponse):
     created_at: datetime
 
 
-class PaginatedWalletResponse(BaseResponse):
+class PaginatedWalletQueriesResponse(BaseResponse):
     data: List[WalletQueryResponse]
     total: int

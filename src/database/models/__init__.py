@@ -1,1 +1,1 @@
-from src.database.models.models import WalletQuery  # noqa: F401
+from src.database.models.models import WalletQueryModel  # noqa: F401

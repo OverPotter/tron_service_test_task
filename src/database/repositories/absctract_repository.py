@@ -1,14 +1,13 @@
 from abc import ABC
 from typing import Generic, Sequence, Type, TypeVar
 
-from sqlalchemy import Executable, delete
+from sqlalchemy import delete
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
 from src.database.models.base import Base
 
 _MODEL_TYPE = TypeVar("_MODEL_TYPE", bound=Base)
-_QUERY = TypeVar("_QUERY", bound=Executable)
 
 
 class AbstractRepository(ABC, Generic[_MODEL_TYPE]):
