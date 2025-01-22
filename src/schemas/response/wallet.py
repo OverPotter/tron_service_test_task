@@ -1,5 +1,4 @@
 from datetime import datetime
-from typing import List
 
 from src.schemas.response.base import BaseResponse
 
@@ -11,8 +10,3 @@ class WalletQueryResponse(BaseResponse):
     bandwidth: str
     energy: str
     created_at: datetime
-
-
-class PaginatedWalletQueriesResponse(BaseResponse):
-    data: List[WalletQueryResponse]
-    total: int

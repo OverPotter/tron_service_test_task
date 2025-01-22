@@ -1,10 +1,12 @@
-from ...database.repositories.wallet_query_repository import (
+from src.database.repositories.wallet_query_repository import (
     WalletQueryRepository,
 )
-from ...schemas.payload.wallet import WalletQueryInfoPayload
-from ...schemas.response.wallet import WalletQueryResponse
-from ..logging_service.logging_service import Logger
-from .abc import AbstractSaveWalletQueryService
+from src.schemas.payload.wallet import WalletQueryInfoPayload
+from src.schemas.response.wallet import WalletQueryResponse
+from src.services.logging_service.logging_service import Logger
+from src.services.save_wallet_query_service.abc_service import (
+    AbstractSaveWalletQueryService,
+)
 
 
 class RepositorySaveWalletQueryService(AbstractSaveWalletQueryService):
@@ -18,11 +20,11 @@ class RepositorySaveWalletQueryService(AbstractSaveWalletQueryService):
         self,
         wallet_info: WalletQueryInfoPayload,
     ) -> WalletQueryResponse:
-        print(wallet_info.dict())
         created_wallet_query = await self._wallet_query_repository.create(
             **wallet_info.dict()
         )
         self._logger.info(
             f"Wallet info with address {wallet_info.address} saved in database successfully."
         )
+
         return WalletQueryResponse.model_validate(created_wallet_query)

@@ -4,16 +4,21 @@ from src.database.repositories.manager import (
     OrmRepositoryManager,
     orm_repository_manager_factory,
 )
-from src.schemas.payload.wallet import (
-    WalletAddressPayload,
-)
+from src.schemas.payload.wallet import WalletAddressPayload
+from src.schemas.response.base import BaseResponseWithPagination, Pagination
 from src.schemas.response.wallet import WalletQueryResponse
-from src.services.get_wallet_info_service.abc import (
+from src.services.get_wallet_info_service.abc_service import (
     AbstractGetWalletInfoService,
 )
 from src.services.get_wallet_info_service.tron import TronGetWalletInfoService
+from src.services.get_wallet_queries_service.abc_service import (
+    AbstractGetWalletQueriesService,
+)
+from src.services.get_wallet_queries_service.repository import (
+    RepositoryGetWalletQueriesService,
+)
 from src.services.logging_service.logging_service import logger_factory
-from src.services.save_wallet_query_service.abc import (
+from src.services.save_wallet_query_service.abc_service import (
     AbstractSaveWalletQueryService,
 )
 from src.services.save_wallet_query_service.repository import (
@@ -55,10 +60,29 @@ async def get_wallet_info(
         return wallet_info_response
 
 
-# @router.get("", response_model=PaginatedWalletQueriesResponse)
-# def get_wallet_queries(skip: int = 0, limit: int = 10, repository_manager: OrmRepositoryManager = Depends(
-#         orm_repository_manager_factory
-#     ),):
-#     queries = db.query(WalletQueryModel).offset(skip).limit(limit).all()
-#     total = db.query(WalletQueryModel).count()
-#     return PaginatedWalletQueriesResponse(data=queries, total=total)
+@router.get("", response_model=BaseResponseWithPagination[WalletQueryResponse])
+async def get_wallet_queries(
+    offset: int | None = None,
+    limit: int | None = None,
+    repository_manager: OrmRepositoryManager = Depends(
+        orm_repository_manager_factory
+    ),
+):
+    async with repository_manager:
+        wallet_service: AbstractGetWalletQueriesService = (
+            RepositoryGetWalletQueriesService(
+                wallet_query_repository=repository_manager.get_wallet_query_repository(),
+                logger=logger,
+            )
+        )
+        entities, total = await wallet_service.get_wallet_queries(
+            offset=offset,
+            limit=limit,
+        )
+
+        return BaseResponseWithPagination(
+            data=list(entities),
+            pagination=Pagination(
+                limit=limit or total, offset=offset or 0, total=total
+            ),
+        )

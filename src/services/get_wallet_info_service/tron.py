@@ -1,7 +1,7 @@
 from tronpy import Tron
 
 from src.schemas.payload.wallet import WalletQueryInfoPayload
-from src.services.get_wallet_info_service.abc import (
+from src.services.get_wallet_info_service.abc_service import (
     AbstractGetWalletInfoService,
 )
 from src.services.logging_service.logging_service import Logger
