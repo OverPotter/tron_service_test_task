@@ -7,8 +7,11 @@ from src.database.repositories.manager import (
 from src.schemas.payload.wallet import WalletAddressPayload
 from src.schemas.response.base import BaseResponseWithPagination, Pagination
 from src.schemas.response.wallet import WalletQueryResponse
-from src.services.get_wallet_info_service.abc_service import (
-    AbstractGetWalletInfoService,
+from src.services.create_wallet_query_service.abc_service import (
+    AbstractCreateWalletQueryService,
+)
+from src.services.create_wallet_query_service.facade import (
+    FacadeCreateWalletQueryService,
 )
 from src.services.get_wallet_info_service.tron import TronGetWalletInfoService
 from src.services.get_wallet_queries_service.abc_service import (
@@ -17,14 +20,11 @@ from src.services.get_wallet_queries_service.abc_service import (
 from src.services.get_wallet_queries_service.repository import (
     RepositoryGetWalletQueriesService,
 )
-from src.services.logging_service.logging_service import logger_factory
-from src.services.save_wallet_query_service.abc_service import (
-    AbstractSaveWalletQueryService,
-)
+from src.services.logging_service.logging_factory import logger_factory
 from src.services.save_wallet_query_service.repository import (
     RepositorySaveWalletQueryService,
 )
-from src.services.tron_service.tron_service import tron_factory
+from src.services.tron_service.tron_factory import tron_factory
 
 router = APIRouter(prefix="/wallets", tags=["wallet"])
 
@@ -39,23 +39,22 @@ async def get_wallet_info(
         orm_repository_manager_factory
     ),
 ):
-    # todo: create facade to save SRP
-    tron_service: AbstractGetWalletInfoService = TronGetWalletInfoService(
-        tron_manger=tron, logger=logger
-    )
-    wallet_query_info_payload = tron_service.get_wallet_info(
-        wallet_address=payload.address
-    )
 
     async with repository_manager:
-        wallet_service: AbstractSaveWalletQueryService = (
-            RepositorySaveWalletQueryService(
-                wallet_query_repository=repository_manager.get_wallet_query_repository(),
+        wallet_service: AbstractCreateWalletQueryService = (
+            FacadeCreateWalletQueryService(
+                get_wallet_ifo_service=TronGetWalletInfoService(
+                    tron_manger=tron
+                ),
+                save_wallet_query_service=RepositorySaveWalletQueryService(
+                    wallet_query_repository=repository_manager.get_wallet_query_repository(),
+                ),
                 logger=logger,
             )
         )
-        wallet_info_response = await wallet_service.save_wallet_query(
-            wallet_info=wallet_query_info_payload
+
+        wallet_info_response = await wallet_service.create_wallet_query(
+            wallet_address=payload.address
         )
         return wallet_info_response
 
