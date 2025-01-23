@@ -7,7 +7,7 @@ from src.schemas.response.wallet import WalletQueryResponse
 from src.services.get_wallet_queries_service.abc_service import (
     AbstractGetWalletQueriesService,
 )
-from src.services.logging_service.logging_service import Logger
+from src.services.logging_service.logging_factory import Logger
 
 
 class RepositoryGetWalletQueriesService(AbstractGetWalletQueriesService):
